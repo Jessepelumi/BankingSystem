@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <time.h>
 
 #define MAX_ACCOUNTS 500
@@ -133,16 +134,32 @@ int main()
             {
                 fread(&account, sizeof(struct Account), 1, file_pointer);
                 fclose(file_pointer);
-                int password_check = strcmp(user_account_password, account.account_password);
+                bool isPasswordValid = false;
+                int password_attempts = 0;
 
-                if (password_check == 0)
+                do
                 {
-                    printf("Valid password\n");
-                }
-                else
-                {
-                    printf("Invalid password\n");
-                }
+                    int password_check = strcmp(user_account_password, account.account_password);
+
+                    if (password_check == 0)
+                    {
+                        isPasswordValid = true;
+                        printf("Login successful!\n\n");
+                    }
+                    else
+                    {
+                        password_attempts++;
+                        if (password_attempts <= 5)
+                        {
+                            printf("You entered an incorrect password. Try again!\n");
+                            printf("Password: ");
+                            scanf("%s", user_account_password);
+                        } else {
+                            printf("You have reached a maximum of 5 attempts. No more attempts allowed!\n\n");
+                            break;
+                        }
+                    }
+                } while (!isPasswordValid);
             }
         }
         else if (option == 3)
