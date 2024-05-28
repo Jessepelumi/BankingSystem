@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 struct Account
 {
@@ -11,6 +12,15 @@ struct Account
     float account_balance;
     float loan_balance;
 };
+
+void generate_account_number(char *account_number) {
+    srand(time(NULL));
+    int i;
+    for (i = 0; i < 10; i++) {
+        account_number[i] = '0' + rand() % 10;
+    }
+    account_number[i] = '\0';
+}
 
 int main()
 {
@@ -39,8 +49,9 @@ int main()
 
         printf("Account name: ");
         scanf("%s", account.account_name);
-        printf("Account number: ");
-        scanf("%s", account.account_number);
+        // printf("Account number: ");
+        // scanf("%s", account.account_number);
+        generate_account_number(account.account_number);
         printf("Account password: ");
         scanf("%s", account.account_password);
         printf("Transaction pin: ");
@@ -58,6 +69,7 @@ int main()
         if (written == 1)
         {
             printf("Account successfully registered.\n");
+            printf("Your account number is %s\n", account.account_number);
         }
         else
         {

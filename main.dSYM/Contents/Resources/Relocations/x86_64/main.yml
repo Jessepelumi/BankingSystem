@@ -2,6 +2,7 @@
 triple:          'x86_64-apple-darwin'
 binary-path:     '/Users/JEOLAD/Documents/projects/BankingSystem/main'
 relocations:
-  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100000A40, symSize: 0x35D }
-  - { offsetInCU: 0x5A, offset: 0x5A, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100000A40, symSize: 0x35D }
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _generate_account_number, symObjAddr: 0x0, symBinAddr: 0x1000009A0, symSize: 0x70 }
+  - { offsetInCU: 0x5A, offset: 0x5A, size: 0x8, addend: 0x0, symName: _generate_account_number, symObjAddr: 0x0, symBinAddr: 0x1000009A0, symSize: 0x70 }
+  - { offsetInCU: 0x8C, offset: 0x8C, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x70, symBinAddr: 0x100000A10, symSize: 0x35C }
 ...
