@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define MAX_ACCOUNTS 500
+
 struct Account
 {
     char account_name[30];
@@ -13,13 +15,30 @@ struct Account
     float loan_balance;
 };
 
-void generate_account_number(char *account_number) {
+char account_numbers[MAX_ACCOUNTS][15];
+int num_acounts = 0;
+
+void generate_account_number(char *account_number)
+{
     srand(time(NULL));
     int i;
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 10; i++)
+    {
         account_number[i] = '0' + rand() % 10;
     }
     account_number[i] = '\0';
+}
+
+int account_number_exists(char *account_number)
+{
+    for (int i = 0; i < num_acounts; i++)
+    {
+        if (strcmp(account_numbers[i], account_number) == 0)
+        {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 int main()
@@ -49,9 +68,9 @@ int main()
 
         printf("Account name: ");
         scanf("%s", account.account_name);
-        // printf("Account number: ");
-        // scanf("%s", account.account_number);
-        generate_account_number(account.account_number);
+        do {
+            generate_account_number(account.account_number);
+        } while (account_number_exists(account.account_number));
         printf("Account password: ");
         scanf("%s", account.account_password);
         printf("Transaction pin: ");
