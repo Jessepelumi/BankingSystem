@@ -179,9 +179,19 @@ int main()
                             switch (operation)
                             {
                             case 1:
+#ifdef _WIN32
+                                system("cls"); // Windows
+#else
+                                system("clear"); // Unix-based systems
+#endif
                                 printf("Your current balance is ₦%.2f\n\n", account.account_balance);
                                 break;
                             case 2:
+#ifdef _WIN32
+                                system("cls"); // Windows
+#else
+                                system("clear"); // Unix-based systems
+#endif
                                 printf("How much do you want to deposit?\n");
                                 printf("Amount: ₦");
                                 scanf("%f", &amount);
@@ -202,6 +212,11 @@ int main()
                                 fclose(file_pointer);
                                 break;
                             case 3:
+#ifdef _WIN32
+                                system("cls"); // Windows
+#else
+                                system("clear"); // Unix-based systems
+#endif
                                 printf("How much do you want to withdraw?\n");
                                 printf("Amount: ₦");
                                 scanf("%f", &amount);
@@ -242,12 +257,21 @@ int main()
                                     else
                                     {
                                         pin_attempts++;
-                                        if (pin_attempts > 5)
-                                            printf("Invalid pin. Cannot complete witdrawal.");
+                                        if (pin_attempts >= 5)
+                                            printf("Access Denied. Maximum pin attempts reached.\n");
+                                        else
+                                        {
+                                            printf("Invalid pin. Please try again.\n");
+                                        }
                                     }
                                 } while (!isPinValid && pin_attempts <= 5);
                                 break;
                             case 4:
+#ifdef _WIN32
+                                system("cls"); // Windows
+#else
+                                system("clear"); // Unix-based systems
+#endif
                                 printf("Enter your transaction pin to access loan system\n");
                                 printf("Transaction pin: ");
                                 scanf("%d", &user_transaction_pin);
@@ -317,6 +341,11 @@ int main()
                                 break;
 
                             case 5:
+#ifdef _WIN32
+                                system("cls"); // Windows
+#else
+                                system("clear"); // Unix-based systems
+#endif
                                 printf("You have an outstanding loan of %.2f\n", account.loan_balance);
                                 if (account.loan_balance == 0)
                                 {
@@ -357,6 +386,11 @@ int main()
                                 }
                                 break;
                             case 6:
+#ifdef _WIN32
+                                system("cls"); // Windows
+#else
+                                system("clear"); // Unix-based systems
+#endif
                                 printf("Enter new password: ");
                                 scanf("%s", user_account_password);
 
@@ -383,6 +417,11 @@ int main()
 
                                 break;
                             case 7:
+#ifdef _WIN32
+                                system("cls"); // Windows
+#else
+                                system("clear"); // Unix-based systems
+#endif
                                 printf("Enter new PIN: ");
                                 scanf("%d", &user_transaction_pin);
 
@@ -409,6 +448,11 @@ int main()
 
                                 break;
                             case 8:
+#ifdef _WIN32
+                                system("cls"); // Windows
+#else
+                                system("clear"); // Unix-based systems
+#endif
                                 printf("Logging out...\n\n");
                                 break;
 
