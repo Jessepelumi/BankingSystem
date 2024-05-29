@@ -51,6 +51,7 @@ int main()
 
     char user_account_number[15];
     char user_account_password[25];
+    int user_transaction_pin;
 
     printf("\nWelcome to Jeolad Banking System\n\n");
 
@@ -142,6 +143,8 @@ int main()
                     int password_check = strcmp(user_account_password, account.account_password);
                     int operation;
                     float amount;
+                    int pin_attempts;
+                    bool isPinValid = false;
 
                     if (password_check == 0)
                     {
@@ -152,221 +155,268 @@ int main()
 #endif
 
                         isPasswordValid = true;
-                        printf("Login successful!\n");
-                        printf("What operation do you want to perform?\n\n");
-                        printf("1: Check account balance\n");
-                        printf("2: Deposit money\n");
-                        printf("3: Withdraw money\n");
-                        printf("4: Request loan\n");
-                        printf("5: Repay loan\n");
-                        printf("6: Change password\n");
-                        printf("7: Change transaction pin\n");
-                        printf("8: Logout\n");
-
-                        printf("Operation: ");
-                        scanf("%d", &operation);
-
-                        int user_transaction_pin;
-
-                        float minimum_loan_amount = 5000.00;
-                        float maximum_loan_amount = account.account_balance * 10;
-                        float loan_amount;
-
-                        switch (operation)
+                        printf("Login successful!\n\n");
+                        do
                         {
-                        case 1:
-                            printf("Your current balance is ₦%.2f\n\n", account.account_balance);
-                            break;
-                        case 2:
-                            printf("How much do you want to deposit?\n");
-                            printf("Amount: ₦");
-                            scanf("%f", &amount);
 
-                            account.account_balance += amount;
+                            printf("What operation do you want to perform?\n\n");
+                            printf("1: Check account balance\n");
+                            printf("2: Deposit money\n");
+                            printf("3: Withdraw money\n");
+                            printf("4: Request loan\n");
+                            printf("5: Repay loan\n");
+                            printf("6: Change password\n");
+                            printf("7: Change transaction pin\n");
+                            printf("8: Logout\n");
 
-                            file_pointer = fopen(filename, "wb");
-                            size_t written = fwrite(&account, sizeof(struct Account), 1, file_pointer);
-                            if (written == 1)
-                            {
-                                printf("Yaay! Deposit successful.\n");
-                                printf("Your new balance is ₦%.2f\n\n", account.account_balance);
-                            }
-                            else
-                            {
-                                printf("Error encountered. Deposit unsuccessful.\n\n");
-                            }
-                            fclose(file_pointer);
-                            break;
-                        case 3:
-                            printf("How much do you want to withdraw?\n");
-                            printf("Amount: ₦");
-                            scanf("%f", &amount);
-                            printf("Transaction pin: ");
-                            scanf("%d", &user_transaction_pin);
+                            printf("Operation: ");
+                            scanf("%d", &operation);
 
-                            if (user_transaction_pin == account.transaction_pin)
+                            float minimum_loan_amount = 5000.00;
+                            float maximum_loan_amount = account.account_balance * 10;
+                            float loan_amount;
+
+                            switch (operation)
                             {
-                                if (amount > account.account_balance)
+                            case 1:
+                                printf("Your current balance is ₦%.2f\n\n", account.account_balance);
+                                break;
+                            case 2:
+                                printf("How much do you want to deposit?\n");
+                                printf("Amount: ₦");
+                                scanf("%f", &amount);
+
+                                account.account_balance += amount;
+
+                                file_pointer = fopen(filename, "wb");
+                                size_t written = fwrite(&account, sizeof(struct Account), 1, file_pointer);
+                                if (written == 1)
                                 {
-                                    printf("Insufficient funds! Withdrawal successful.\n\n");
+                                    printf("Yaay! Deposit successful.\n");
+                                    printf("Your new balance is ₦%.2f\n\n", account.account_balance);
                                 }
                                 else
                                 {
-                                    account.account_balance -= amount;
+                                    printf("Error encountered. Deposit unsuccessful.\n\n");
+                                }
+                                fclose(file_pointer);
+                                break;
+                            case 3:
+                                printf("How much do you want to withdraw?\n");
+                                printf("Amount: ₦");
+                                scanf("%f", &amount);
 
-                                    file_pointer = fopen(filename, "wb");
-                                    size_t written = fwrite(&account, sizeof(struct Account), 1, file_pointer);
-                                    if (written == 1)
+                                pin_attempts = 0;
+                                isPinValid = false;
+
+                                do
+                                {
+                                    printf("Transaction pin: ");
+                                    scanf("%d", &user_transaction_pin);
+
+                                    if (user_transaction_pin == account.transaction_pin)
                                     {
-                                        printf("Yaay! Withdrawal successful.\n");
-                                        printf("Your new balance is ₦%.2f\n\n", account.account_balance);
+                                        isPinValid = true;
+                                        if (amount > account.account_balance)
+                                        {
+                                            printf("Insufficient funds! Withdrawal successful.\n\n");
+                                        }
+                                        else
+                                        {
+                                            account.account_balance -= amount;
+
+                                            file_pointer = fopen(filename, "wb");
+                                            size_t written = fwrite(&account, sizeof(struct Account), 1, file_pointer);
+                                            if (written == 1)
+                                            {
+                                                printf("Yaay! Withdrawal successful.\n");
+                                                printf("Your new balance is ₦%.2f\n\n", account.account_balance);
+                                            }
+                                            else
+                                            {
+                                                printf("Error encountered. Withdrawal unsuccessful.\n\n");
+                                            }
+                                            fclose(file_pointer);
+                                        }
                                     }
                                     else
                                     {
-                                        printf("Error encountered. Withdrawal unsuccessful.\n\n");
+                                        pin_attempts++;
+                                        if (pin_attempts > 5)
+                                            printf("Invalid pin. Cannot complete witdrawal.");
                                     }
-                                    fclose(file_pointer);
-                                }
-                            }
-                            else
-                            {
-                                printf("Invalid pin. Cannot complete witdrawal.");
-                            }
-                            break;
-                        case 4:
-                            printf("Enter your transaction pin to access loan system\n");
-                            printf("Transaction pin: ");
-                            scanf("%d", &user_transaction_pin);
-                            if (user_transaction_pin == account.transaction_pin)
-                            {
-                                printf("You now have access to the loan system\n");
-                                printf("You are eligible to borrow a minimum of ₦%.2f and a maximum of ₦%.2f\n", minimum_loan_amount, maximum_loan_amount);
+                                } while (!isPinValid && pin_attempts <= 5);
+                                break;
+                            case 4:
+                                printf("Enter your transaction pin to access loan system\n");
+                                printf("Transaction pin: ");
+                                scanf("%d", &user_transaction_pin);
 
-                                printf("Enter loan amount: ");
-                                scanf("%f", &loan_amount);
+                                pin_attempts = 0;   // Reset pin attempts
+                                isPinValid = false; // Reset pin validation
 
-                                if (account.loan_balance >= maximum_loan_amount)
+                                do
                                 {
-                                    printf("You can't receive more loan.");
+                                    if (user_transaction_pin == account.transaction_pin)
+                                    {
+                                        isPinValid = true; // Set pin validation to true
+                                        printf("You now have access to the loan system\n");
+                                        printf("You are eligible to borrow a minimum of ₦%.2f and a maximum of ₦%.2f\n", minimum_loan_amount, maximum_loan_amount);
+
+                                        printf("Enter loan amount: ");
+                                        scanf("%f", &loan_amount);
+
+                                        if (account.loan_balance >= maximum_loan_amount)
+                                        {
+                                            printf("You can't receive more loan.");
+                                        }
+                                        else
+                                        {
+                                            if (loan_amount < minimum_loan_amount)
+                                            {
+                                                printf("Minimum allowed is ₦%.2f", minimum_loan_amount);
+                                            }
+                                            else if (loan_amount > maximum_loan_amount)
+                                            {
+                                                printf("Maximum allowed is ₦%.2f\n\n", maximum_loan_amount);
+                                            }
+                                            else
+                                            {
+                                                account.loan_balance += loan_amount + (loan_amount * 0.25);
+                                                account.account_balance += loan_amount;
+
+                                                file_pointer = fopen(filename, "wb");
+                                                size_t written = fwrite(&account, sizeof(struct Account), 1, file_pointer);
+                                                if (written == 1)
+                                                {
+                                                    printf("Loan collected.\n");
+                                                    printf("Your new account balance is ₦%.2f\n", account.account_balance);
+                                                    printf("Your loan balance is ₦%.2f\n\n", account.loan_balance);
+                                                }
+                                                else
+                                                {
+                                                    printf("Error encountered. Loan request unsuccessful.\n\n");
+                                                }
+                                                fclose(file_pointer);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        pin_attempts++;
+                                        if (pin_attempts > 5)
+                                            printf("Access Denied. Maximum pin attempts reached.\n");
+                                        else
+                                        {
+                                            printf("Invalid pin. Please try again.\n");
+                                            printf("Transaction pin: ");
+                                            scanf("%d", &user_transaction_pin);
+                                        }
+                                    }
+                                } while (!isPinValid && pin_attempts <= 5);
+                                break;
+
+                            case 5:
+                                printf("You have an outstanding loan of %.2f\n", account.loan_balance);
+                                if (account.loan_balance == 0)
+                                {
+                                    printf("No outstanding loan to be paid");
+                                    break;
                                 }
                                 else
                                 {
-                                    if (loan_amount < minimum_loan_amount)
+                                    printf("Enter amount: ");
+                                    scanf("%f", &amount);
+                                    if (amount > account.account_balance)
                                     {
-                                        printf("Minimum allowed is ₦%.2f", minimum_loan_amount);
+                                        printf("Insufficient funds. Enter an amount more than ₦%.2f", account.account_balance);
                                     }
-                                    else if (loan_amount > maximum_loan_amount)
+                                    else if (amount > account.loan_balance)
                                     {
-                                        printf("Maximum allowed is ₦%.2f\n\n", maximum_loan_amount);
+                                        printf("You have entered excess funds. Enter an amount between ₦%.2f and ₦%.2f", account.account_balance, account.loan_balance);
                                     }
                                     else
                                     {
-                                        account.loan_balance += loan_amount + (loan_amount * 0.25);
-                                        account.account_balance += loan_amount;
+                                        account.loan_balance -= amount;
+                                        account.account_balance -= amount;
 
                                         file_pointer = fopen(filename, "wb");
                                         size_t written = fwrite(&account, sizeof(struct Account), 1, file_pointer);
                                         if (written == 1)
                                         {
-                                            printf("Loan collected.\n");
+                                            printf("Deposit added.\n");
                                             printf("Your new account balance is ₦%.2f\n", account.account_balance);
                                             printf("Your loan balance is ₦%.2f\n\n", account.loan_balance);
                                         }
                                         else
                                         {
-                                            printf("Error encountered. Loan request unsuccessful.\n\n");
+                                            printf("Error encountered. Deposit unsuccessful.\n\n");
                                         }
                                         fclose(file_pointer);
                                     }
                                 }
-                            }
-                            else
-                            {
-                                printf("Access Denied");
-                            }
-                            break;
-                        case 5:
-                            printf("You have an outstanding loan of %.2f\n", account.loan_balance);
-                            if (account.loan_balance == 0)
-                            {
-                                printf("No outstanding loan to be paid");
                                 break;
-                            }
-                            else
-                            {
-                                printf("Enter amount: ");
-                                scanf("%f", &amount);
-                                if (amount < account.account_balance)
-                                {
-                                    printf("Insufficient funds. Enter an amount more than ₦%.2f", account.account_balance);
-                                }
-                                else if (amount > account.loan_balance)
-                                {
-                                    printf("You have entered excess funds. Enter an amount between ₦%.2f and ₦%.2f", account.account_balance, account.loan_balance);
-                                }
-                                else
-                                {
-                                    account.loan_balance -= amount;
-                                    account.account_balance -= amount;
+                            case 6:
+                                printf("Enter new password: ");
+                                scanf("%s", user_account_password);
 
-                                    file_pointer = fopen(filename, "wb");
-                                    size_t written = fwrite(&account, sizeof(struct Account), 1, file_pointer);
-                                    if (written == 1)
+                                strcpy(account.account_password, user_account_password);
+
+                                file_pointer = fopen(filename, "r+b");
+                                if (file_pointer != NULL)
+                                {
+                                    size_t written_password = fwrite(&account, sizeof(struct Account), 1, file_pointer);
+                                    if (written_password == 1)
                                     {
-                                        printf("Deposit added.\n");
-                                        printf("Your new account balance is ₦%.2f\n", account.account_balance);
-                                        printf("Your loan balance is ₦%.2f\n\n", account.loan_balance);
+                                        printf("Password sucessfully changed.\n\n");
                                     }
                                     else
                                     {
-                                        printf("Error encountered. Deposit unsuccessful.\n\n");
+                                        printf("Attempt to change password was unsucessful.\n\n");
                                     }
                                     fclose(file_pointer);
                                 }
-                            }
-                            break;
-                        case 6:
-                            printf("Enter new password: ");
-                            scanf("%s", user_account_password);
+                                else
+                                {
+                                    printf("Error opening file.\n\n");
+                                }
 
-                            file_pointer = fopen(filename, "wb");
-                            strcpy(account.account_password, user_account_password);
-                            size_t written = fwrite(&account, sizeof(struct Account), 1, file_pointer);
-                            if (written == 1)
-                            {
-                                printf("Password sucessfully changed.\n\n");
-                            }
-                            else
-                            {
-                                printf("Attempt to change password was unsucessful.\n\n");
-                            }
-                            fclose(file_pointer);
-                            break;
-                        case 7:
-                            printf("Enter new pin: ");
-                            scanf("%s", user_transaction_pin);
+                                break;
+                            case 7:
+                                printf("Enter new PIN: ");
+                                scanf("%d", &user_transaction_pin);
 
-                            file_pointer = fopen(filename, "wb");
-                            account.transaction_pin = user_transaction_pin;
-                            size_t written = fwrite(&account, sizeof(struct Account), 1, file_pointer);
-                            if (written == 1)
-                            {
-                                printf("Pin sucessfully changed.\n\n");
-                            }
-                            else
-                            {
-                                printf("Attempt to change pin was unsucessful.\n\n");
-                            }
-                            fclose(file_pointer);
-                            break;
-                        case 8:
-                            printf("Logging out...\n\n");
-                            break;
+                                account.transaction_pin = user_transaction_pin;
 
-                        default:
-                            printf("Invalid option. Try again!\n\n");
-                            break;
-                        }
+                                file_pointer = fopen(filename, "r+b");
+                                if (file_pointer != NULL)
+                                {
+                                    size_t written_pin = fwrite(&account, sizeof(struct Account), 1, file_pointer);
+                                    if (written_pin == 1)
+                                    {
+                                        printf("Pin sucessfully changed.\n\n");
+                                    }
+                                    else
+                                    {
+                                        printf("Attempt to change pin was unsucessful.\n\n");
+                                    }
+                                    fclose(file_pointer);
+                                }
+                                else
+                                {
+                                    printf("Error opening file.\n\n");
+                                }
+
+                                break;
+                            case 8:
+                                printf("Logging out...\n\n");
+                                break;
+
+                            default:
+                                printf("Invalid option. Try again!\n\n");
+                                break;
+                            }
+                        } while (operation != 8);
                     }
                     else
                     {
